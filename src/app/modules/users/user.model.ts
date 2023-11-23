@@ -66,4 +66,9 @@ const user = this;
  next()
 })
 
+UserSchema.pre('find',function(next){
+    this.find().projection({username:1,fullName:1,age:1,email:1,address:1})
+    next();
+})
+
 export const User = model('User', UserSchema);
