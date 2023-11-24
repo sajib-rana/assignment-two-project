@@ -1,3 +1,5 @@
+import { Model } from "mongoose";
+
 export type TFullName = {
   firstName: string;
   lastName: string;
@@ -26,6 +28,10 @@ export type TUser = {
   hobbies: string[];
   address: TAddress;
   orders: TOrder[];
+}
+
+export interface userModel extends Model<TUser> {
+  isUserExists(userId:number):Promise<TUser | null>
 }
 
 

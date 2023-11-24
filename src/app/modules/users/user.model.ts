@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import validator from 'validator';
 import bcrypt from 'bcrypt'
-import { TAddress, TFullName, TOrder, TUser } from "./user.interface";
+import { TAddress, TFullName, TOrder, TUser, userModel } from "./user.interface";
 import config from "../../config";
 
 const FullNameSchema = new Schema<TFullName>({
@@ -29,27 +29,27 @@ const FullNameSchema = new Schema<TFullName>({
 });
 
 const AddressSchema = new Schema<TAddress>({
-  street:{type: String},
-  city: {type:String},
-  country: {type:String},
+  street:{type: String,required:true},
+  city: {type:String,required:true},
+  country: {type:String,required:true},
 });
 
 const OrderSchema = new Schema<TOrder>({
-  productName: {type:String},
-  price: {type:Number},
-  quantity: {type: Number},
+  productName: {type:String,required:true},
+  price: {type:Number,required:true},
+  quantity: {type: Number,required:true},
 });
 
-const UserSchema = new Schema<TUser>({
-  userId: {type:Number,unique:true},
-  username: {type: String,unique:true},
-  password: {type: String},
-  fullName: FullNameSchema,
-  age: {type: Number},
-  email: {type: String},
+const UserSchema = new Schema<TUser,userModel>({
+  userId: {type:Number,unique:true,required:true},
+  username: {type: String,unique:true,required:true},
+  password: {type: String,required:true},
+  fullName: {type:FullNameSchema,required:true},
+  age: {type: Number,required:true},
+  email: {type: String,required:true},
   isActive: {type: Boolean},
   hobbies: [String],
-  address: AddressSchema,
+  address: {type:AddressSchema,required:true},
   orders: [OrderSchema],
 });
 
@@ -71,4 +71,9 @@ UserSchema.pre('find',function(next){
     next();
 })
 
-export const User = model('User', UserSchema);
+UserSchema.statics.isUserExists = async function(userId:number){
+ const existingUser = await User.findOne({userId});
+    return existingUser;
+}
+
+export const User = model<TUser,userModel>('User', UserSchema);
