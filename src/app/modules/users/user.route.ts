@@ -8,6 +8,7 @@ router.get('/users',userControllers.getAllUser)
 router.get('/users/:userId',userControllers.getSingleUser)
 router.delete('/users/:userId',userControllers.deleteUser)
 router.put('/users/:userId/orders',userControllers.addOrderToUser)
+router.get('/users/:userId/orders',userControllers.getUserOrders)
 router.get('/users/:userId/orders/total-price',userControllers.calculateTotalPrice)
 
 
