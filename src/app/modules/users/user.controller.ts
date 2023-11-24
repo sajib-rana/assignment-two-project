@@ -123,10 +123,45 @@ const addOrderToUser = async (req: Request, res: Response) => {
   }
 };
 
+const calculateTotalPrice = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+    const user = await userServices.calculatePriceIntoDB(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        data: null,
+      });
+    }
+    const totalPrice = user.orders.reduce(
+      (sum, order) => sum + order.price * order.quantity,
+      0,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Total price calculated successfully!',
+      data: {
+        totalPrice: totalPrice.toFixed(2), 
+      },
+    });
+  } catch (err:any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || 'something wrong',
+      error: err,
+    });
+  }
+};
+
+
 export const userControllers = {
   createUser,
   getAllUser,
   getSingleUser,
   deleteUser,
-  addOrderToUser
+  addOrderToUser,
+  calculateTotalPrice
 };
