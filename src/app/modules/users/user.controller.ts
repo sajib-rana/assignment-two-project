@@ -94,9 +94,39 @@ const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
+const addOrderToUser = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+    const orderData = req.body;
+    console.log(userId,orderData)
+    const user = await userServices.ordersCreateIntoDB(userId,orderData);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        data: null,
+      });
+    }
+        
+
+    res.status(201).json({
+      success: true,
+      message: 'Order created successfully!',
+      data: null,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+};
+
 export const userControllers = {
   createUser,
   getAllUser,
   getSingleUser,
   deleteUser,
+  addOrderToUser
 };
