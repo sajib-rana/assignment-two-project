@@ -17,13 +17,19 @@ const getAllUserFromDB = async () =>{
     const result = await User.find();
     return result
 }
-const getSingleUserFromBD = async (id:number) =>{
-    const result = await User.findOne({userId:id});
+const getSingleUserFromBD = async (userId:number) =>{
+    const result = await User.findOne({userId:userId});
     return result
 }
+
+const deleteUserFromDB = async (userId: number)=>{
+    const result = await User.deleteOne({userId:userId});
+    return result;
+} 
 
 export const userServices = {
     creatUserIntoDB,
     getAllUserFromDB,
-    getSingleUserFromBD
+    getSingleUserFromBD,
+    deleteUserFromDB
 }
