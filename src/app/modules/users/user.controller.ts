@@ -181,6 +181,37 @@ const getUserOrders = async (req: Request, res: Response) => {
     });
   }
 };
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+    const updatedData = req.body;
+    const user = await userServices.updateUserInDB(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+        data: null,
+      });
+    }
+
+    Object.assign(user, updatedData);
+    const { password, ...modifiedData } = user;
+    console.log(modifiedData);
+    await user.save(updatedData);
+    res.status(200).json({
+      success: true,
+      message: 'All updated data are Here',
+      data: modifiedData,
+    });
+  } catch (err:any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || 'something wrong',
+      error: err,
+    });
+  }
+};
 
 
 export const userControllers = {
@@ -190,5 +221,6 @@ export const userControllers = {
   deleteUser,
   addOrderToUser,
   calculateTotalPrice,
-  getUserOrders
+  getUserOrders,
+  updateUser
 };

@@ -22,6 +22,11 @@ const getSingleUserFromBD = async (userId:number) =>{
     return result
 }
 
+const updateUserInDB = async (userId: number) => {
+  const result = await User.findOne({ userId });
+  return result;
+}; 
+
 const deleteUserFromDB = async (userId: number)=>{
     const result = await User.deleteOne({userId:userId});
     return result;
@@ -49,5 +54,6 @@ export const userServices = {
     deleteUserFromDB,
     ordersCreateIntoDB,
     calculatePriceIntoDB,
-    getUserAllOrders
+    getUserAllOrders,
+    updateUserInDB
 }
