@@ -25,7 +25,7 @@ const AddressSchema = z.object({
   country: z.string().min(1, { message: 'Country is required' }),
 });
 
-const OrderSchema = z.object({
+export const OrderSchema = z.object({
   productName: z.string().min(1, { message: 'Product name is required' }),
   price: z
     .number()
@@ -45,7 +45,7 @@ export const UserSchema = z.object({
   isActive: z.boolean(),
   hobbies: z.array(z.string()),
   address: AddressSchema,
-  orders: z.array(OrderSchema),
+  orders: z.array(OrderSchema).optional(),
 });
 
 export const UserZodModel = UserSchema;

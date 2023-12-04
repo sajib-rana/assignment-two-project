@@ -18,18 +18,21 @@ const getAllUserFromDB = async () =>{
     return result
 }
 const getSingleUserFromBD = async (userId:number) =>{
-    const result = await User.findOne({userId:userId});
+    const result = await User.findOne({userId:userId}).select('-orders');
     return result
 }
 
-const updateUserInDB = async (userId: number) => {
-  const result = await User.findOne({ userId });
+const updateUserInDB = async (userId: number,user:Partial<TUser>) => {
+  const result = await User.findOneAndUpdate({ userId },user,{new:true}).select('-orders -password');
   return result;
 }; 
 
 const deleteUserFromDB = async (userId: number)=>{
-    const result = await User.deleteOne({userId:userId});
-    return result;
+  if(!await User.isUserExists(userId)){
+    throw new Error('user not found')
+  }
+  const result = await User.deleteOne({userId});
+  return result;
 } 
 const ordersCreateIntoDB = async (userId: number, order: TOrder) => {
   const result = await User.updateOne(

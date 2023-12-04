@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { userServices } from './user.service';
-import { UserZodModel } from './user.validation';
+import { OrderSchema, UserSchema, UserZodModel } from './user.validation';
+
+
 
 const createUser = async (req: Request, res: Response) => {
   try {
@@ -68,22 +70,13 @@ const getSingleUser = async (req: Request, res: Response) => {
 const deleteUser = async (req: Request, res: Response) => {
   try {
     const userId = Number(req.params.userId);
-    const result = await userServices.deleteUserFromDB(userId);
-    console.log(result);
-    if (result.deletedCount === 0) {
-      res.status(404).json({
-        success: false,
-        message: 'User not found',
-        data: null,
-      });
-    } else {
+    await userServices.deleteUserFromDB(userId);
+    
         res.status(200).json({
         success: true,
         message: 'User deleted successfully',
         data: null,
       });
-    }
-  
     
   } catch (err:any) {
      res.status(500).json({
@@ -98,8 +91,8 @@ const addOrderToUser = async (req: Request, res: Response) => {
   try {
     const userId = Number(req.params.userId);
     const orderData = req.body;
-    console.log(userId,orderData)
-    const user = await userServices.ordersCreateIntoDB(userId,orderData);
+    const zodPerData = OrderSchema.parse(orderData)
+    const user = await userServices.ordersCreateIntoDB(userId,zodPerData);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -117,7 +110,7 @@ const addOrderToUser = async (req: Request, res: Response) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: 'Internal server error',
+      message: err,
       data: null,
     });
   }
@@ -135,7 +128,8 @@ const calculateTotalPrice = async (req: Request, res: Response) => {
         data: null,
       });
     }
-    const totalPrice = user.orders.reduce(
+  
+    const totalPrice = user?.orders?.reduce(
       (sum, order) => sum + order.price * order.quantity,
       0,
     );
@@ -144,7 +138,7 @@ const calculateTotalPrice = async (req: Request, res: Response) => {
       success: true,
       message: 'Total price calculated successfully!',
       data: {
-        totalPrice: totalPrice.toFixed(2), 
+        totalPrice: totalPrice?.toFixed(2), 
       },
     });
   } catch (err:any) {
@@ -185,7 +179,7 @@ const updateUser = async (req: Request, res: Response) => {
   try {
     const userId = Number(req.params.userId);
     const updatedData = req.body;
-    const user = await userServices.updateUserInDB(userId);
+    const user = await userServices.updateUserInDB(userId,updatedData);
 
     if (!user) {
       return res.status(404).json({
@@ -194,15 +188,10 @@ const updateUser = async (req: Request, res: Response) => {
         data: null,
       });
     }
-
-    Object.assign(user, updatedData);
-    const { password, ...modifiedData } = user;
-    console.log(modifiedData);
-    await user.save(updatedData);
     res.status(200).json({
       success: true,
       message: 'All updated data are Here',
-      data: modifiedData,
+      data: user,
     });
   } catch (err:any) {
     res.status(500).json({
