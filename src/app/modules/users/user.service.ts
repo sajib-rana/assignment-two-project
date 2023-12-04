@@ -35,6 +35,9 @@ const deleteUserFromDB = async (userId: number)=>{
   return result;
 } 
 const ordersCreateIntoDB = async (userId: number, order: TOrder) => {
+  if (!(await User.isUserExists(userId))) {
+    throw new Error('user not found');
+  }
   const result = await User.updateOne(
     { userId },
     { $addToSet: { orders: order } },

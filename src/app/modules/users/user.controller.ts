@@ -6,7 +6,7 @@ import { OrderSchema, UserSchema, UserZodModel } from './user.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
-    const user = req.body.user;
+    const user = req.body;
     const zodParseData = UserZodModel.parse(user);
     const result = await userServices.creatUserIntoDB(zodParseData);
 
@@ -92,26 +92,19 @@ const addOrderToUser = async (req: Request, res: Response) => {
     const userId = Number(req.params.userId);
     const orderData = req.body;
     const zodPerData = OrderSchema.parse(orderData)
-    const user = await userServices.ordersCreateIntoDB(userId,zodPerData);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found',
-        data: null,
-      });
-    }
-        
-
-    res.status(201).json({
+    await userServices.ordersCreateIntoDB(userId,zodPerData);
+    
+     res.status(201).json({
       success: true,
       message: 'Order created successfully!',
       data: null,
     });
-  } catch (err) {
+    }
+    catch (err:any) {
     res.status(500).json({
       success: false,
-      message: err,
-      data: null,
+      message: err.message,
+       err,
     });
   }
 };
